@@ -1,22 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SecureShield Anti-Cheat</title>
+<title>SentinelX Security</title>
 
 <style>
 body {
     margin:0;
-    overflow:hidden;
-    font-family:Arial;
-    background:#0f172a;
+    font-family: Arial;
+    background:#0b1220;
     color:white;
 }
 
-/* NORMAL SITE */
-#site {
+/* HEADER */
+header {
+    padding:20px;
+    background:#020617;
+    border-bottom:1px solid #1e293b;
+    font-size:22px;
+}
+
+/* HERO */
+#hero {
     text-align:center;
-    margin-top:120px;
+    padding:100px 20px;
 }
 
 button {
@@ -27,253 +34,119 @@ button {
     cursor:pointer;
 }
 
-/* SCREENS */
-.screen {
+/* SCAN UI */
+#scanner {
+    display:none;
+    text-align:center;
+    padding-top:100px;
+}
+
+.bar {
+    width:60%;
+    height:20px;
+    background:#1e293b;
+    margin:auto;
+}
+
+.progress {
+    height:100%;
+    width:0%;
+    background:#22c55e;
+}
+
+/* ALERT */
+#alert {
     display:none;
     position:fixed;
-    width:100%;
-    height:100%;
-}
-
-/* BSOD */
-#bsod {
-    background:#0078D7;
-    color:white;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-}
-
-/* TAKEOVER */
-#takeover {
-    background:black;
-    color:lime;
-    font-family:monospace;
+    top:20px;
+    right:20px;
+    background:red;
     padding:20px;
-}
-
-/* CHAOS TEXT */
-.txt {
-    position:absolute;
-    color:red;
     font-weight:bold;
+    animation: blink 1s infinite;
 }
 
-/* CAT */
-.cat {
-    position:absolute;
-    width:100px;
+@keyframes blink {
+    50% {opacity:0;}
 }
 
-/* SHAKE */
-@keyframes shake {
-0%{transform:translate(5px,5px);}
-50%{transform:translate(-5px,-5px);}
-100%{transform:translate(5px,-5px);}
-}
-.shake { animation:shake 0.1s infinite; }
-
-/* FAKE LOGIN */
-#login {
-    background:#111;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
+/* RESULTS */
+#results {
+    display:none;
+    text-align:center;
+    margin-top:50px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="site">
-<h1>🛡 SecureShield Anti-Cheat</h1>
-<button onclick="start()">Download</button>
+<header>🛡 SentinelX Advanced Security</header>
+
+<div id="hero">
+    <h1>Next-Gen AI Antivirus Protection</h1>
+    <p>Real-time threat detection and system monitoring</p>
+    <button onclick="startScan()">Run Full Scan</button>
 </div>
 
-<div id="bsod" class="screen">
-<h1>:(</h1>
-<div id="percent">0%</div>
+<div id="scanner">
+    <h2>Scanning System...</h2>
+    <div class="bar"><div class="progress" id="prog"></div></div>
+    <p id="status">Initializing...</p>
 </div>
 
-<div id="takeover" class="screen">
-<div id="term"></div>
-</div>
+<div id="alert">⚠ THREAT DETECTED ⚠</div>
 
-<div id="login" class="screen">
-<h1>Windows Login</h1>
-<input placeholder="Password"><br><br>
-<button onclick="end()">Login</button>
+<div id="results">
+    <h2>Scan Results</h2>
+    <p id="resText"></p>
 </div>
 
 <script>
+function startScan(){
+    document.getElementById("hero").style.display="none";
+    document.getElementById("scanner").style.display="block";
 
-function start(){
-document.getElementById("site").style.display="none";
-setTimeout(bsod,500);
+    let p=0;
+    let prog=document.getElementById("prog");
+    let status=document.getElementById("status");
+
+    let steps=[
+        "Initializing engine...",
+        "Scanning memory...",
+        "Checking network...",
+        "Analyzing files...",
+        "Detecting anomalies..."
+    ];
+
+    let i=0;
+
+    let interval=setInterval(()=>{
+        p+=2;
+        prog.style.width=p+"%";
+
+        if(p%20===0 && i<steps.length){
+            status.innerText=steps[i++];
+        }
+
+        if(p>=70){
+            document.getElementById("alert").style.display="block";
+        }
+
+        if(p>=100){
+            clearInterval(interval);
+            finish();
+        }
+    },80);
 }
 
-/* BSOD */
-function bsod(){
-let s=document.getElementById("bsod");
-s.style.display="flex";
+function finish(){
+    document.getElementById("scanner").style.display="none";
+    document.getElementById("results").style.display="block";
 
-let p=0;
-let t=document.getElementById("percent");
-
-let i=setInterval(()=>{
-p+=Math.random()*10;
-t.innerText=Math.floor(p)+"%";
-if(p>=100){clearInterval(i); takeover();}
-},100);
+    document.getElementById("resText").innerHTML=
+    "⚠ Suspicious activity detected<br>Risk Level: HIGH<br><br>(Simulation Demo)";
 }
-
-/* TAKEOVER */
-function takeover(){
-document.getElementById("bsod").style.display="none";
-let t=document.getElementById("takeover");
-t.style.display="block";
-
-let term=document.getElementById("term");
-
-let lines=[
-"Launching AntiCheat.exe",
-"Scanning...",
-"Discord detected",
-"Steam detected",
-"IP: "+randIP(),
-"Uploading data...",
-"System compromised"
-];
-
-let i=0;
-function type(){
-if(i<lines.length){
-term.innerHTML+=lines[i]+"<br>";
-beep();
-i++;
-setTimeout(type,300);
-}else{
-chaos();
-}
-}
-type();
-}
-
-/* CHAOS */
-function chaos(){
-document.body.classList.add("shake");
-
-/* mouse chaos */
-setInterval(()=>{
-window.scrollTo(Math.random()*50,Math.random()*50);
-},50);
-
-/* spam text */
-setInterval(()=>{
-let d=document.createElement("div");
-d.className="txt";
-d.innerText="YOU GOT HACKED";
-d.style.top=Math.random()*window.innerHeight+"px";
-d.style.left=Math.random()*window.innerWidth+"px";
-document.body.appendChild(d);
-setTimeout(()=>d.remove(),2000);
-},80);
-
-/* cats */
-setInterval(spawnCat,200);
-
-/* sounds */
-setInterval(beep,40);
-
-/* fake webcam popup */
-setTimeout(()=>{
-alert("⚠ Camera accessed!");
-},2000);
-
-/* fake ip leak */
-setTimeout(()=>{
-alert("IP LEAKED: "+randIP());
-},3500);
-
-/* go login */
-setTimeout(login,8000);
-}
-
-/* CAT */
-function spawnCat(){
-let c=document.createElement("img");
-c.src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif";
-c.className="cat";
-
-let x=Math.random()*window.innerWidth;
-let y=Math.random()*window.innerHeight;
-let dx=(Math.random()*6)-3;
-let dy=(Math.random()*6)-3;
-
-document.body.appendChild(c);
-
-let move=setInterval(()=>{
-x+=dx;
-y+=dy;
-
-c.style.left=x+"px";
-c.style.top=y+"px";
-
-/* rainbow */
-let r=document.createElement("div");
-r.style.position="absolute";
-r.style.width="5px";
-r.style.height="5px";
-r.style.background=`hsl(${Math.random()*360},100%,50%)`;
-r.style.left=x+"px";
-r.style.top=y+"px";
-document.body.appendChild(r);
-setTimeout(()=>r.remove(),500);
-
-},16);
-
-setTimeout(()=>{clearInterval(move);c.remove();},4000);
-}
-
-/* SOUND */
-function beep(){
-let ctx=new(window.AudioContext||window.webkitAudioContext)();
-let o=ctx.createOscillator();
-o.frequency.value=Math.random()*2000;
-o.connect(ctx.destination);
-o.start();
-o.stop(ctx.currentTime+0.05);
-}
-
-/* RANDOM IP */
-function randIP(){
-return `${rand(1,255)}.${rand(1,255)}.${rand(1,255)}.${rand(1,255)}`;
-}
-function rand(a,b){return Math.floor(Math.random()*(b-a)+a);}
-
-/* LOGIN */
-function login(){
-document.getElementById("takeover").style.display="none";
-document.getElementById("login").style.display="flex";
-}
-
-/* END */
-function end(){
-document.body.classList.remove("shake");
-document.body.innerHTML=`
-<h1 style="color:lime;text-align:center;margin-top:20%">
-😄 YOU GOT DESTROYED 😄<br>Just a prank.
-</h1>`;
-}
-
-/* fullscreen */
-document.body.onclick=()=>{
-document.documentElement.requestFullscreen().catch(()=>{});
-};
-
 </script>
 
 </body>
