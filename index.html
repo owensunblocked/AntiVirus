@@ -7,9 +7,10 @@
 <style>
 body {
     margin:0;
-    font-family: Arial;
+    font-family:Arial;
     background:#0b1220;
     color:white;
+    overflow:hidden;
 }
 
 /* HEADER */
@@ -17,13 +18,12 @@ header {
     padding:20px;
     background:#020617;
     border-bottom:1px solid #1e293b;
-    font-size:22px;
 }
 
 /* HERO */
 #hero {
     text-align:center;
-    padding:100px 20px;
+    padding:100px;
 }
 
 button {
@@ -34,7 +34,7 @@ button {
     cursor:pointer;
 }
 
-/* SCAN UI */
+/* SCANNER */
 #scanner {
     display:none;
     text-align:center;
@@ -47,7 +47,6 @@ button {
     background:#1e293b;
     margin:auto;
 }
-
 .progress {
     height:100%;
     width:0%;
@@ -61,20 +60,29 @@ button {
     top:20px;
     right:20px;
     background:red;
-    padding:20px;
+    padding:15px;
     font-weight:bold;
     animation: blink 1s infinite;
 }
+@keyframes blink {50%{opacity:0;}}
 
-@keyframes blink {
-    50% {opacity:0;}
+/* CHAOS */
+@keyframes shake {
+0%{transform:translate(5px,5px);}
+50%{transform:translate(-5px,-5px);}
+100%{transform:translate(5px,-5px);}
+}
+.shake { animation:shake 0.1s infinite; }
+
+.cat {
+    position:absolute;
+    width:100px;
 }
 
-/* RESULTS */
-#results {
-    display:none;
-    text-align:center;
-    margin-top:50px;
+.text {
+    position:absolute;
+    color:red;
+    font-weight:bold;
 }
 </style>
 </head>
@@ -85,7 +93,7 @@ button {
 
 <div id="hero">
     <h1>Next-Gen AI Antivirus Protection</h1>
-    <p>Real-time threat detection and system monitoring</p>
+    <p>Real-time threat detection</p>
     <button onclick="startScan()">Run Full Scan</button>
 </div>
 
@@ -97,20 +105,12 @@ button {
 
 <div id="alert">⚠ THREAT DETECTED ⚠</div>
 
-<div id="results">
-    <h2>Scan Results</h2>
-    <p id="resText"></p>
-</div>
-
 <script>
 function startScan(){
-    document.getElementById("hero").style.display="none";
-    document.getElementById("scanner").style.display="block";
+    hero.style.display="none";
+    scanner.style.display="block";
 
     let p=0;
-    let prog=document.getElementById("prog");
-    let status=document.getElementById("status");
-
     let steps=[
         "Initializing engine...",
         "Scanning memory...",
@@ -118,7 +118,6 @@ function startScan(){
         "Analyzing files...",
         "Detecting anomalies..."
     ];
-
     let i=0;
 
     let interval=setInterval(()=>{
@@ -130,22 +129,94 @@ function startScan(){
         }
 
         if(p>=70){
-            document.getElementById("alert").style.display="block";
+            alertBox.style.display="block";
         }
 
         if(p>=100){
             clearInterval(interval);
-            finish();
+            chaos();
         }
-    },80);
+    },70);
 }
 
-function finish(){
-    document.getElementById("scanner").style.display="none";
-    document.getElementById("results").style.display="block";
+function chaos(){
+    document.body.classList.add("shake");
 
-    document.getElementById("resText").innerHTML=
-    "⚠ Suspicious activity detected<br>Risk Level: HIGH<br><br>(Simulation Demo)";
+    // spawn cats
+    setInterval(spawnCat,200);
+
+    // spam text
+    setInterval(()=>{
+        let t=document.createElement("div");
+        t.className="text";
+        t.innerText="YOU GOT HACKED";
+        t.style.top=Math.random()*window.innerHeight+"px";
+        t.style.left=Math.random()*window.innerWidth+"px";
+        document.body.appendChild(t);
+        setTimeout(()=>t.remove(),2000);
+    },80);
+
+    // sound
+    setInterval(beep,50);
+
+    // stop after 8 sec
+    setTimeout(end,8000);
+}
+
+function spawnCat(){
+    let c=document.createElement("img");
+    c.src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif";
+    c.className="cat";
+
+    let x=Math.random()*window.innerWidth;
+    let y=Math.random()*window.innerHeight;
+    let dx=(Math.random()*6)-3;
+    let dy=(Math.random()*6)-3;
+
+    document.body.appendChild(c);
+
+    let move=setInterval(()=>{
+        x+=dx;
+        y+=dy;
+
+        c.style.left=x+"px";
+        c.style.top=y+"px";
+
+        // rainbow trail
+        let r=document.createElement("div");
+        r.style.position="absolute";
+        r.style.width="5px";
+        r.style.height="5px";
+        r.style.background=`hsl(${Math.random()*360},100%,50%)`;
+        r.style.left=x+"px";
+        r.style.top=y+"px";
+        document.body.appendChild(r);
+
+        setTimeout(()=>r.remove(),500);
+
+    },16);
+
+    setTimeout(()=>{
+        clearInterval(move);
+        c.remove();
+    },4000);
+}
+
+function beep(){
+    let ctx=new(window.AudioContext||window.webkitAudioContext)();
+    let o=ctx.createOscillator();
+    o.frequency.value=Math.random()*2000;
+    o.connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime+0.05);
+}
+
+function end(){
+    document.body.classList.remove("shake");
+    document.body.innerHTML=`
+    <h1 style="color:lime;text-align:center;margin-top:20%">
+    Scan Complete ✔<br>No real threats found.
+    </h1>`;
 }
 </script>
 
